@@ -1,5 +1,6 @@
 package cn.pengshao.registry.config;
 
+import cn.pengshao.registry.cluster.Cluster;
 import cn.pengshao.registry.health.HealthChecker;
 import cn.pengshao.registry.health.PsHealthChecker;
 import cn.pengshao.registry.service.PsRegistryService;
@@ -25,6 +26,11 @@ public class PsRegistryConfig {
     @Bean(initMethod = "start", destroyMethod = "stop")
     public HealthChecker healthChecker(@Autowired RegistryService registryService) {
         return new PsHealthChecker(registryService);
+    }
+
+    @Bean(initMethod = "init")
+    public Cluster cluster(@Autowired PsRegistryConfigProperties properties) {
+        return new Cluster(properties);
     }
 
 }

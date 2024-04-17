@@ -30,12 +30,12 @@ public class PsHealthChecker implements HealthChecker {
     @Override
     public void start() {
         executor.scheduleWithFixedDelay(() -> {
-            log.info(" ===> Health checker running...");
+            log.info("[PsHealthChecker] ===> Health checker running...");
             long currentTime = System.currentTimeMillis();
             PsRegistryService.TIMESTAMPS.keySet().forEach(serviceAndInst -> {
                 Long timestamp = PsRegistryService.TIMESTAMPS.get(serviceAndInst);
                 if (currentTime - timestamp > timeout) {
-                    log.info(" ===> Health checker timeout, service: {}", serviceAndInst);
+                    log.info("[PsHealthChecker] ===> Health checker timeout, service: {}", serviceAndInst);
 
                     int index = serviceAndInst.indexOf("@");
                     String service = serviceAndInst.substring(0, index);
