@@ -2,6 +2,7 @@ package cn.pengshao.registry.cluster;
 
 import cn.pengshao.registry.config.PsRegistryConfigProperties;
 import cn.pengshao.registry.http.HttpInvoker;
+import cn.pengshao.registry.service.PsRegistryService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * Description:Registry cluster
@@ -41,7 +41,7 @@ public class Cluster {
     private List<Server> servers;
     // 集群探活、选举
     final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-    long timeout = 5000L;
+    long interval = 5000L;
 
     public void init() {
         try (InetUtils inetUtils = new InetUtils(new InetUtilsProperties())) {
@@ -76,30 +76,11 @@ public class Cluster {
             } catch (Exception e) {
                 log.error("[Cluster] ===> error", e);
             }
-        }, 0, timeout, TimeUnit.MILLISECONDS);
+        }, 0, interval, TimeUnit.MILLISECONDS);
     }
 
     private void updateServers() {
-        // 探活
-        servers.forEach(server -> {
-            try {
-                if (server.getUrl().equals(MYSELF.getUrl())) {
-                    // 自己不需要探活
-                    return;
-                }
 
-                Server serverInfo = HttpInvoker.httpGet(server.getUrl() + "/info", Server.class);
-                if (serverInfo != null) {
-                    server.setStatus(true);
-                    server.setLeader(serverInfo.isLeader());
-                    server.setVersion(serverInfo.getVersion());
-                }
-            } catch (Exception e) {
-                log.info("[Cluster] ===> health check failed for {}", server);
-                server.setStatus(false);
-                server.setLeader(false);
-            }
-        });
     }
 
     private void electLeader() {
@@ -142,6 +123,7 @@ public class Cluster {
     }
 
     public Server self() {
+        MYSELF.setVersion(PsRegistryService.VERSION.get());
         return MYSELF;
     }
 

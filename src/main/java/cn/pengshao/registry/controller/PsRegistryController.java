@@ -33,12 +33,20 @@ public class PsRegistryController {
     @RequestMapping("/register")
     public InstanceMeta register(@RequestParam String service, @RequestBody InstanceMeta instanceMeta) {
         log.info(" ===> register: {} @ {}", service, instanceMeta);
+        checkLeader();
         return registryService.register(service, instanceMeta);
+    }
+
+    private void checkLeader() {
+        if (!cluster.self().isLeader()) {
+            throw new RuntimeException("current server is not a leader, the leader is " + cluster.leader().getUrl());
+        }
     }
 
     @RequestMapping("/unregister")
     public InstanceMeta unregister(@RequestParam String service, @RequestBody InstanceMeta instanceMeta) {
         log.info(" ===> unregister: {} @ {}", service, instanceMeta);
+        checkLeader();
         return registryService.unregister(service, instanceMeta);
     }
 
@@ -51,12 +59,14 @@ public class PsRegistryController {
     @RequestMapping("/renews")
     public long renews(@RequestParam String services, @RequestBody InstanceMeta instanceMeta) {
         log.info(" ===> renews: {} @ {}", services, instanceMeta);
+        checkLeader();
         return registryService.renew(instanceMeta, services.split(","));
     }
 
     @RequestMapping("/renew")
     public long renew(@RequestParam String service, @RequestBody InstanceMeta instanceMeta) {
         log.info(" ===> renew: {} @ {}", service, instanceMeta);
+        checkLeader();
         return registryService.renew(instanceMeta, service);
     }
 

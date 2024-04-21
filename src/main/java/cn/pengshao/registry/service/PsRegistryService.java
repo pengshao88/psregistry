@@ -27,7 +27,7 @@ public class PsRegistryService implements RegistryService {
     final static Map<String, Long> VERSIONS = new ConcurrentHashMap<>();
     // 记录时间戳
     public static final Map<String, Long> TIMESTAMPS = new ConcurrentHashMap<>();
-    final static AtomicLong VERSION = new AtomicLong(0);
+    public final static AtomicLong VERSION = new AtomicLong(0);
 
     @Override
     public InstanceMeta register(String service, InstanceMeta instanceMeta) {
