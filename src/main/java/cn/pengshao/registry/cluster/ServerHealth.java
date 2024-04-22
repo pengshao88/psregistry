@@ -1,6 +1,7 @@
 package cn.pengshao.registry.cluster;
 
 import cn.pengshao.registry.http.HttpInvoker;
+import cn.pengshao.registry.service.PsRegistryService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -49,13 +50,14 @@ public class ServerHealth {
                 }
 
                 Server serverInfo = HttpInvoker.httpGet(server.getUrl() + "/info", Server.class);
+                log.debug("[ServerHealth] ===> health check success for {}", server);
                 if (serverInfo != null) {
                     server.setStatus(true);
                     server.setLeader(serverInfo.isLeader());
                     server.setVersion(serverInfo.getVersion());
                 }
             } catch (Exception e) {
-                log.info("[Cluster] ===> health check failed for {}", server);
+                log.warn("[ServerHealth] ===> health check failed for {}", server);
                 server.setStatus(false);
                 server.setLeader(false);
             }
@@ -63,11 +65,19 @@ public class ServerHealth {
     }
 
     private void doElect() {
-
-
+        new Election().electLeader(cluster.getServers());
     }
 
     private void syncSnapshotFromLeader() {
+        Server self = cluster.self();
+        Server leader = cluster.leader();
+        log.debug("[ServerHealth] ===> self: {}, leader: {}", self, leader);
 
+        if (!self.isLeader() && self.getVersion() < leader.getVersion()) {
+            log.info("[ServerHealth] ===> sync snapshot from leader: {}", leader);
+            Snapshot snapshot = HttpInvoker.httpGet(leader.getUrl() + "/snapshot", Snapshot.class);
+            log.info("[ServerHealth] ===> sync and restore snapshot: {}", snapshot);
+            PsRegistryService.restore(snapshot);
+        }
     }
 }

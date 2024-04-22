@@ -19,7 +19,7 @@ import java.util.Map;
 @Data
 public class Snapshot {
     LinkedMultiValueMap<String, InstanceMeta> REGISTRY;
-    Map<String, Long> VERSION;
-    Map<String, Long> TIMESTAMP;
+    Map<String, Long> VERSIONS;
+    Map<String, Long> TIMESTAMPS;
     long version;
 }
