@@ -23,10 +23,10 @@ public class PsRegistryConfig {
         return new PsRegistryService();
     }
 
-//    @Bean(initMethod = "start", destroyMethod = "stop")
-//    public HealthChecker healthChecker(@Autowired RegistryService registryService) {
-//        return new PsHealthChecker(registryService);
-//    }
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    public HealthChecker healthChecker(@Autowired RegistryService registryService) {
+        return new PsHealthChecker(registryService);
+    }
 
     @Bean(initMethod = "init")
     public Cluster cluster(@Autowired PsRegistryConfigProperties properties) {
