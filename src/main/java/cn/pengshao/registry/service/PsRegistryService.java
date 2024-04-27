@@ -25,7 +25,7 @@ public class PsRegistryService implements RegistryService {
 
     // 注册服务信息
     final static MultiValueMap<String, InstanceMeta> REGISTRY = new LinkedMultiValueMap<>();
-    // 记录版本信息 todo 为什么注册 和 下线 都要加一？？
+    // 记录版本信息
     final static Map<String, Long> VERSIONS = new ConcurrentHashMap<>();
     // 记录时间戳
     public static final Map<String, Long> TIMESTAMPS = new ConcurrentHashMap<>();
